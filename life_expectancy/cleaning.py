@@ -35,3 +35,4 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument('--country', help='Country to use as filter')
     args = parser.parse_args()
     clean_data(args)
+    
