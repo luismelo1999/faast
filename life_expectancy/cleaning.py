@@ -1,5 +1,4 @@
 import argparse
-from dataclasses import dataclass
 import pandas as pd
 
 def load_data():
@@ -58,8 +57,5 @@ if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(description='Clean data and filter by country')
     parser.add_argument('--country', help='Country to use as filter')
     args = parser.parse_args()
-    
-    main(args["country"])
 
-    
-    
+    main(args["country"])
