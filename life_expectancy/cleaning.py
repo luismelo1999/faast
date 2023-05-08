@@ -1,25 +1,41 @@
 import argparse
+from pathlib import Path
 import pandas as pd
 
-def load_data():
+def load_data() -> pd.DataFrame:
     '''
-    Cleans the data
+    Loads the csv file that contains the data
+    returns:
+        data(Pandas DataFrame): Loaded dataframe
+
     '''
+
+    script_dir = Path(__file__).resolve().parent
+    file_path = script_dir/"data"/"eu_life_expectancy_raw.tsv"
+
     # load input dataframe
-    data = pd.read_csv('life_expectancy/data/eu_life_expectancy_raw.tsv', sep='\t')
+    data = pd.read_csv(file_path, sep='\t')
 
     return data
 
-def save_data(data):
+def save_data(data: pd.DataFrame) -> None:
     '''
-    Cleans the data
+    Saves the input dataframe into a csv file
+    Args:
+        data (Pandas DataFrame): DataFrame to be saved
     '''
 
-    data.to_csv('life_expectancy/data/pt_life_expectancy.csv', index = False)
+    script_dir = Path(__file__).resolve().parent
+    data.to_csv(script_dir/"data"/"pt_life_expectancy.csv", index=False)
 
-def clean_data(data, country = 'PT'):
+def clean_data(data: pd.DataFrame, country: str = 'PT'):
     '''
-    Cleans the data
+    Cleans and filters the input data
+    Args:
+        data (Pandas DataFrame): DataFrame to be cleaned
+        country (str): String with country
+    returns:
+        filtered_df (Pandas DataFrame): Dataframe cleaned an filtered
     '''
 
     ids = ['unit', 'sex', 'age', 'region']
