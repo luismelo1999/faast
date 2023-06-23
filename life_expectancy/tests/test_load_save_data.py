@@ -1,8 +1,8 @@
 """Tests for the cleaning module"""
 import pandas as pd
 
-from life_expectancy.load_save_data import load_data, save_data
 from pytest import MonkeyPatch
+from life_expectancy.load_save_data import load_data, save_data
 from . import OUTPUT_DIR
 
 
@@ -16,12 +16,13 @@ def test_load_data(eu_life_expectancy_expected)-> None:
 
 def test_save_data(
         monkeypatch: MonkeyPatch,
-        capsys, 
+        capsys,
         pt_life_expectancy_expected
     ) -> None:
+    """Run the `save_data` function and checks if the function does what is meant to"""
 
     # Define a mock function to replace pd.DataFrame.to_csv
-    def mock_to_csv(*args, **kwargs):
+    def mock_to_csv():
         print("Data saved successfully")
 
     # Patch pd.DataFrame.to_csv to return the mock function instead of the real one

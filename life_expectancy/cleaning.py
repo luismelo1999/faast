@@ -1,4 +1,4 @@
-from pathlib import Path
+""" Cleaning data script """
 import pandas as pd
 
 def clean_data(data: pd.DataFrame, country: str = 'PT') -> pd.DataFrame:
@@ -33,4 +33,3 @@ def clean_data(data: pd.DataFrame, country: str = 'PT') -> pd.DataFrame:
     filtered_df = cleaned_df[cleaned_df['region'] == country]
 
     return filtered_df
-
