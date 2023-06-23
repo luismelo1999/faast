@@ -22,7 +22,7 @@ def test_save_data(
     """Run the `save_data` function and checks if the function does what is meant to"""
 
     # Define a mock function to replace pd.DataFrame.to_csv
-    def mock_to_csv():
+    def mock_to_csv(*args, **kwargs):
         print("Data saved successfully")
 
     # Patch pd.DataFrame.to_csv to return the mock function instead of the real one

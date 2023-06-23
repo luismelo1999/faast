@@ -8,7 +8,7 @@ def test_main(pt_life_expectancy_expected, monkeypatch: MonkeyPatch) -> None:
     """Run the `main` function and compare the output to the expected output"""
 
     # Define a mock function to replace pd.DataFrame.to_csv
-    def mock_to_csv():
+    def mock_to_csv(*args, **kwargs):
         print("Data saved successfully")
 
     # Patch pd.DataFrame.to_csv to return the mock function instead of the real one
