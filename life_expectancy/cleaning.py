@@ -1,34 +1,7 @@
-import argparse
 from pathlib import Path
 import pandas as pd
 
-def load_data() -> pd.DataFrame:
-    '''
-    Loads the csv file that contains the data
-    returns:
-        data(Pandas DataFrame): Loaded dataframe
-
-    '''
-
-    script_dir = Path(__file__).resolve().parent
-    file_path = script_dir/"data"/"eu_life_expectancy_raw.tsv"
-
-    # load input dataframe
-    data = pd.read_csv(file_path, sep='\t')
-
-    return data
-
-def save_data(data: pd.DataFrame) -> None:
-    '''
-    Saves the input dataframe into a csv file
-    Args:
-        data (Pandas DataFrame): DataFrame to be saved
-    '''
-
-    script_dir = Path(__file__).resolve().parent
-    data.to_csv(script_dir/"data"/"pt_life_expectancy.csv", index=False)
-
-def clean_data(data: pd.DataFrame, country: str = 'PT'):
+def clean_data(data: pd.DataFrame, country: str = 'PT') -> pd.DataFrame:
     '''
     Cleans and filters the input data
     Args:
@@ -61,17 +34,3 @@ def clean_data(data: pd.DataFrame, country: str = 'PT'):
 
     return filtered_df
 
-def main(country = 'PT'):
-    """
-    main function
-    """
-    data = load_data()
-    cleaned_data = clean_data(data, country)
-    save_data(cleaned_data)
-
-if __name__ == "__main__":  # pragma: no cover
-    parser = argparse.ArgumentParser(description='Clean data and filter by country')
-    parser.add_argument('--country', help='Country to use as filter')
-    args = parser.parse_args()
-
-    main(args["country"])
