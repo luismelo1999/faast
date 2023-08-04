@@ -1,19 +1,42 @@
 """ Load and save data script """
 from pathlib import Path
+from abc import ABC, abstractmethod
 import pandas as pd
 
-def load_data(file_path) -> pd.DataFrame:
-    '''
-    Loads the csv file that contains the data
-    returns:
-        data(Pandas DataFrame): Loaded dataframe
 
-    '''
+# Define the strategy interface
+class DataLoaderStrategy(ABC):
+    """Abstract class for loading data"""
+    @abstractmethod
+    def load_data(self, file_path):
+        """Abstract method to load the data"""
 
-    # load input dataframe
-    data = pd.read_csv(file_path, sep='\t')
+# Concrete strategy classes
+class TSVLoader(DataLoaderStrategy):
+    """class for loading TSV data"""
 
-    return data
+    def load_data(self, file_path) -> pd.DataFrame:
+        '''
+        Loads the csv file that contains the data
+        returns:
+            data(Pandas DataFrame): Loaded dataframe
+        '''
+
+        # load input tsv dataframe
+        return pd.read_csv(file_path, sep='\t')
+
+class JSONLoader(DataLoaderStrategy):
+    """class for cleaning JSON data"""
+
+    def load_data(self, file_path):
+        '''
+        Loads the json file that contains the data
+        returns:
+            data(Pandas DataFrame): Loaded dataframe
+        '''
+
+        # load input json dataframe
+        return pd.read_json(file_path, compression="infer")
 
 def save_data(data: pd.DataFrame) -> None:
     '''
