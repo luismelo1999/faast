@@ -28,7 +28,7 @@ class TSVLoader(DataLoaderStrategy):
 class JSONLoader(DataLoaderStrategy):
     """class for cleaning JSON data"""
 
-    def load_data(self, file_path):
+    def load_data(self, file_path) -> pd.DataFrame:
         '''
         Loads the json file that contains the data
         returns:

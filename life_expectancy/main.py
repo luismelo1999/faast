@@ -32,8 +32,8 @@ def main(file_path: Path, region: Region = Region.PT) -> pd.DataFrame:
     return cleaned_data
 
 if __name__ == "__main__":  # pragma: no cover
-    parser = argparse.ArgumentParser(description='Clean data and filter by country')
-    parser.add_argument('--country', help='Country to use as filter')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file_path')
+    parser.add_argument('region')
     args = parser.parse_args()
-
-    main(file_path_tsv, Region.PT)
+    main(args.file_path, args.region)
