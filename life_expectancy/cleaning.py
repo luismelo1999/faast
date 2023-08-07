@@ -1,77 +1,70 @@
-import argparse
-from pathlib import Path
+""" Cleaning data script """
+from abc import ABC, abstractmethod
 import pandas as pd
+from life_expectancy.regions import Region
 
-def load_data() -> pd.DataFrame:
-    '''
-    Loads the csv file that contains the data
-    returns:
-        data(Pandas DataFrame): Loaded dataframe
+# Define the strategy interface
+class DataCleanerStrategy(ABC):
+    """Abstract class for cleaning data"""
 
-    '''
+    @abstractmethod
+    def clean_data(self, data: pd.DataFrame, region: Region) -> pd.DataFrame:
+        """Abstract method to clean the data"""
 
-    script_dir = Path(__file__).resolve().parent
-    file_path = script_dir/"data"/"eu_life_expectancy_raw.tsv"
+# Concrete strategy classes
+class TSVCleaner(DataCleanerStrategy):
+    """class for cleaning TSV data"""
 
-    # load input dataframe
-    data = pd.read_csv(file_path, sep='\t')
+    def clean_data(self, data: pd.DataFrame, region: Region) -> pd.DataFrame:
+        '''
+        Cleans and filters the input data
+        Args:
+            data (Pandas DataFrame): DataFrame to be cleaned
+            country (str): String with country
+        returns:
+            filtered_df (Pandas DataFrame): Dataframe cleaned an filtered
+        '''
 
-    return data
+        ids = ['unit', 'sex', 'age', 'region']
+        # split the first columns into 4 diferent columns using , as separator
+        data[ids] = data['unit,sex,age,geo\\time'].str.split(',', expand=True)
 
-def save_data(data: pd.DataFrame) -> None:
-    '''
-    Saves the input dataframe into a csv file
-    Args:
-        data (Pandas DataFrame): DataFrame to be saved
-    '''
+        # drop unecessary column
+        data = data.drop(columns=['unit,sex,age,geo\\time'])
 
-    script_dir = Path(__file__).resolve().parent
-    data.to_csv(script_dir/"data"/"pt_life_expectancy.csv", index=False)
+        # unpivot the dataset to long format
+        melted_df = pd.melt(data, value_vars = data.drop(columns = ids).columns,
+            id_vars = ids, var_name = 'year', value_name='value')
 
-def clean_data(data: pd.DataFrame, country: str = 'PT'):
-    '''
-    Cleans and filters the input data
-    Args:
-        data (Pandas DataFrame): DataFrame to be cleaned
-        country (str): String with country
-    returns:
-        filtered_df (Pandas DataFrame): Dataframe cleaned an filtered
-    '''
+        # ensures year is a int
+        melted_df['year'] = melted_df['year'].astype(int)
 
-    ids = ['unit', 'sex', 'age', 'region']
-    # split the first columns into 4 diferent columns using , as separator
-    data[ids] = data['unit,sex,age,geo\\time'].str.split(',', expand=True)
+        # cleans column value and ensures value is a float
+        melted_df['value'] = (melted_df['value'].str.extract(r'(\d+\.?\d*)').astype(float))
+        cleaned_df = melted_df.dropna()
 
-    # drop unecessary column
-    data = data.drop(columns=['unit,sex,age,geo\\time'])
+        # filter for country
+        filtered_df = cleaned_df[cleaned_df['region'] == region.value]
 
-    # unpivot the dataset to long format
-    melted_df = pd.melt(data, value_vars = data.drop(columns = ids).columns,
-          id_vars = ids, var_name = 'year', value_name='value')
+        return filtered_df
 
-    # ensures year is a int
-    melted_df['year'] = melted_df['year'].astype(int)
+class JSONCleaner(DataCleanerStrategy):
+    """class for cleaning JSON data"""
 
-    # cleans column value and ensures value is a float
-    melted_df['value'] = (melted_df['value'].str.extract(r'(\d+\.?\d*)').astype(float))
-    cleaned_df = melted_df.dropna()
+    def clean_data(self, data: pd.DataFrame, region: Region) -> pd.DataFrame:
+        '''
+        Cleans and filters the input data
+        Args:
+            data (Pandas DataFrame): DataFrame to be cleaned
+            country (str): String with country
+        returns:
+            filtered_df (Pandas DataFrame): Dataframe cleaned an filtered
+        '''
 
-    # filter for country
-    filtered_df = cleaned_df[cleaned_df['region'] == country]
+        renamed_df = data.rename(columns={"country": "region", "life_expectancy": "value"})
 
-    return filtered_df
+        cleaned_df = renamed_df.drop(columns=["flag", "flag_detail"], axis = 1)
 
-def main(country = 'PT'):
-    """
-    main function
-    """
-    data = load_data()
-    cleaned_data = clean_data(data, country)
-    save_data(cleaned_data)
+        filtered_df = cleaned_df[cleaned_df["region"] == region.value]
 
-if __name__ == "__main__":  # pragma: no cover
-    parser = argparse.ArgumentParser(description='Clean data and filter by country')
-    parser.add_argument('--country', help='Country to use as filter')
-    args = parser.parse_args()
-
-    main(args["country"])
+        return filtered_df
